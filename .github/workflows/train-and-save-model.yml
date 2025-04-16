@@ -69,7 +69,7 @@ jobs:
 
   
   Save_Model:
-    name: Save Model
+    name: Save Model to S3
     needs: train
     runs-on: ubuntu-latest
     permissions:
@@ -87,8 +87,8 @@ jobs:
 
       - name: Install AWS cli
         run: |
-          sudo apt-get update
-          sudo apt-get install -y awscli
+          python -m pip install --upgrade pip
+          pip install awscli
 
 
       - name: Configure AWS credentials
