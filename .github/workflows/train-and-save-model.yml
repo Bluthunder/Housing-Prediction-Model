@@ -1,0 +1,137 @@
+name: Train and Save Model to S3
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+
+  setup:
+    name: Setup & Install Dependencies
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Cache Dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install Dependencies
+        run: pip install -r requirements/requirements.txt
+
+      - name: Upload Dependencies
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-dependencies
+          path: ~/.cache/pip
+
+  train:
+    name: Train Model
+    needs: setup
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Restore Dependencies
+        uses: actions/download-artifact@v4
+        with:
+          name: python-dependencies
+          path: ~/.cache/pip
+
+      - name: Install Dependencies (Ensure Installation)
+        run: pip install -r requirements/requirements.txt
+
+      - name: Train Model
+        run: |
+          python housing_prediction/train_pipeline.py
+          python housing_prediction/predict.py
+
+      - name: Save Trained Model
+        uses: actions/upload-artifact@v4
+        with:
+          name: trained-model
+          path: housing_prediction/trained_models/
+
+  
+  Save_Model:
+    name: Save Model
+    needs: train
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write # This is crucial for OIDC
+      contents: read # To checkout the code
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install AWS cli
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y awscli
+
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::008971663545:role/s3-iam-role
+          aws-region: "$ {{secrets.AWS_REGION}}"
+    
+      - name: Download Trained Model
+        uses: actions/download-artifact@v4
+        with:
+            name: trained-model
+            path: housing_prediction/trained_models/
+
+      - name: Upload model to S3
+        run: aws s3 cp trained_model s3://model-artifactory-kaushik/housing_predictions/ --recursive
+
+#   build_python_package:
+#     name: Build Python Package
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout Repository
+#         uses: actions/checkout@v4
+
+#       - name: Restore Dependencies
+#         uses: actions/download-artifact@v4
+#         with:
+#           name: python-dependencies
+#           path: ~/.cache/pip
+
+#       - name: Install Dependencies
+#         run: pip install -r requirements/requirements.txt
+
+#       - name: Build Package (.whl)
+#         run: |
+#           python setup.py sdist bdist_wheel
+#         #   mv dist/*.whl bike_sharing_api/bikeshare_model-0.0.1-py3-none-any.whl
+
+#       - name: Upload Model Package
+#         uses: actions/upload-artifact@v4
+#         with:
+#           name: model-package
+#           path: bike_sharing_api/bikeshare_model-0.0.1-py3-none-any.whl
+
+      
