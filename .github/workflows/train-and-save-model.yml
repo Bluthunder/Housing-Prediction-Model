@@ -72,7 +72,7 @@ jobs:
     name: Save Model to S3
     needs: train
     runs-on: ubuntu-latest
-    environment: PROD
+    # environment: PROD
     permissions:
       id-token: write # This is crucial for OIDC
       contents: read # To checkout the code
@@ -96,7 +96,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::008971663545:role/s3-iam-role
-          aws-region: "${{secrets.AWS_REGION}}"
+          aws-region: us-east-1
     
       - name: Download Trained Model
         uses: actions/download-artifact@v4
