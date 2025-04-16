@@ -72,6 +72,7 @@ jobs:
     name: Save Model to S3
     needs: train
     runs-on: ubuntu-latest
+    environment: PROD
     permissions:
       id-token: write # This is crucial for OIDC
       contents: read # To checkout the code
