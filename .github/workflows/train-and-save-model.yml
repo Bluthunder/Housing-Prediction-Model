@@ -105,7 +105,8 @@ jobs:
             path: housing_prediction/trained_models/
 
       - name: Upload model to S3
-        run: aws s3 cp trained_model s3://model-artifactory-kaushik/housing_predictions/ --recursive
+        run: aws s3 cp housing_prediction/trained_models/ s3://model-artifactory-kaushik/housing_predictions/ --recursive
+        
 
 #   build_python_package:
 #     name: Build Python Package
