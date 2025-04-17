@@ -128,8 +128,4 @@ if __name__ == "__main__":
     input_df = pd.DataFrame(data_in)
     
     make_prediction(input_data=input_df)
-
-    with open("metrics.txt", "w") as f:
-      f.write(f"### 📈 Model Prediction on sample test data\n")
-      f.write(f"- {make_prediction} ")
      
