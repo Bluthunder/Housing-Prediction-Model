@@ -40,6 +40,11 @@ def run_training() -> None:
 
     # printing the score
     print("R2 Score (in %):", r2_score(y_test, y_pred)*100)
+
+    with open("metrics.txt", "w") as f:
+      f.write(f"### 📈 Model Performance Metrics\n")
+      f.write(f"- R² Score: {r2_score(y_test, y_pred)*100:.4f}\n")
+      f.write(f"- Sample Prediction: {y_pred[:5]}\n")
     
 if __name__ == "__main__":
     print("Running")

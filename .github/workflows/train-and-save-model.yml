@@ -63,6 +63,11 @@ jobs:
           python housing_prediction/train_pipeline.py
           python housing_prediction/predict.py
 
+      - name: Save training metrics to summary
+        run: |
+           echo "### ✅ Model Training Complete" >> $GITHUB_STEP_SUMMARY
+           cat metrics.txt >> $GITHUB_STEP_SUMMARY
+
       - name: Save Trained Model
         uses: actions/upload-artifact@v4
         with:
@@ -147,7 +152,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           name: Release ${{ github.ref_name }}
-          tag_name: ${{ github.ref }}
+          tag_name: ${{ github.ref_name }}
           generate_release_notes: true
           files: dist/*.whl
         env:
