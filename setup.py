@@ -6,7 +6,7 @@ from pathlib import Path
 from setuptools import find_packages, setup
 
 # Package meta-data.
-NAME = 'Housing Prediction Model'
+NAME = 'housing-prediction-model'
 DESCRIPTION = "ML model to predict housing prices"
 EMAIL = "kaushiktd@gmail.com"
 AUTHOR = "Kaushik T D Roy"

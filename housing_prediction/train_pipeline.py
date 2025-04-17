@@ -1,6 +1,5 @@
 import sys
 from pathlib import Path
-import pdb 
 
 file = Path(__file__).resolve()
 parent, root = file.parent, file.parents[1]
@@ -44,7 +43,7 @@ def run_training() -> None:
     with open("metrics.txt", "w") as f:
       f.write(f"### 📈 Model Performance Metrics\n")
       f.write(f"- R² Score: {r2_score(y_test, y_pred)*100:.4f}\n")
-      f.write(f"- Sample Prediction: {y_pred[:5]}\n")
+      f.write(f"- Sample Predictions: {y_pred[:5]}\n")
     
 if __name__ == "__main__":
     print("Running")
