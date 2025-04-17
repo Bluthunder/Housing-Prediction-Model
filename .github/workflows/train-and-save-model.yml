@@ -119,6 +119,9 @@ jobs:
     name: Build Python Package
     needs: Save_Model
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write # This is crucial for OIDC
+      contents: read
 
     steps:
       - name: Checkout Repository
