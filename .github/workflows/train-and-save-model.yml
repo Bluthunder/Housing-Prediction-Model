@@ -148,7 +148,7 @@ jobs:
           path: dist/*.whl
 
       - name: Create GitHub Release and Upload Wheel
-        if: startsWith(github.ref, 'refs/tags/')
+        if: github.ref_type == 'tag'
         uses: softprops/action-gh-release@v2
         with:
           name: Release ${{ github.ref_name }}
