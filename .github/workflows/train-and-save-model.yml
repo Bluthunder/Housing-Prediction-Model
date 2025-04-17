@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    tags:
+      - 'v*'
   workflow_dispatch:
 
 jobs:
@@ -108,32 +110,45 @@ jobs:
         run: aws s3 cp housing_prediction/trained_models/ s3://model-artifactory-kaushik/housing_predictions/ --recursive
         
 
-#   build_python_package:
-#     name: Build Python Package
-#     runs-on: ubuntu-latest
+  build_python_package:
+    name: Build Python Package
+    runs-on: ubuntu-latest
 
-#     steps:
-#       - name: Checkout Repository
-#         uses: actions/checkout@v4
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-#       - name: Restore Dependencies
-#         uses: actions/download-artifact@v4
-#         with:
-#           name: python-dependencies
-#           path: ~/.cache/pip
+      - name: Restore Dependencies
+        uses: actions/download-artifact@v4
+        with:
+          name: python-dependencies
+          path: ~/.cache/pip
 
-#       - name: Install Dependencies
-#         run: pip install -r requirements/requirements.txt
+      - name: Install Dependencies
+        run: pip install -r requirements/requirements.txt
 
-#       - name: Build Package (.whl)
-#         run: |
-#           python setup.py sdist bdist_wheel
-#         #   mv dist/*.whl bike_sharing_api/bikeshare_model-0.0.1-py3-none-any.whl
+      - name: Install build tools
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
 
-#       - name: Upload Model Package
-#         uses: actions/upload-artifact@v4
-#         with:
-#           name: model-package
-#           path: bike_sharing_api/bikeshare_model-0.0.1-py3-none-any.whl
+      - name: Build Package (.whl)
+        run: |
+          python setup.py sdist bdist_wheel
+
+      - name: Upload Model Package as Artifact 
+        uses: actions/upload-artifact@v4
+        with:
+          name: model-package
+          path: dist/*.whl
+
+      - name: Create GitHub Release and Upload Wheel
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Release ${{ github.ref_name }}
+          tag_name: ${{ github.ref }}
+          generate_release_notes: true
+          files: dist/*.whl
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       
