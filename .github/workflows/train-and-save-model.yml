@@ -112,6 +112,7 @@ jobs:
 
   build_python_package:
     name: Build Python Package
+    needs: Save_Model
     runs-on: ubuntu-latest
 
     steps:
